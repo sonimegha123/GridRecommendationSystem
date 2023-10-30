@@ -25,13 +25,26 @@ data = {
     ('Image', '3.2'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
     ('Image', '3.3'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
     ('Image', '3.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
+    ('Table', '4.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
+    ('Table', '4.2'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
+    ('Table', '4.3'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': True},
+    ('Table', '4.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': True},
+    ('Graph', '5.1a'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
+    ('Graph', '5.1b'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
+    ('Graph', '5.1c'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
+    ('Graph', '5.1d'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
     ('Quote', '6.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
     ('Quote', '6.2'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
     ('Quote', '6.3'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
     ('List', '7.1'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
     ('List', '7.2'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
     ('List', '7.3'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
-    ('List', '7.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
+    ('List', '7.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},  
+    ('Cycle', '8.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
+    ('Process', '9.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
+    ('Timeline', '10.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
+    ('Funnel', '11.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
+    ('Pyramid', '12.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
 }
 
 # Create a MultiIndex from the tuple keys
@@ -41,9 +54,9 @@ index = pd.MultiIndex.from_tuples(data.keys(), names=["Element", "Subset"])
 df = pd.DataFrame(data.values(), index=index)
 
 data = {
-    "Weights": [0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.6, 0.6, 0.6, 0.6, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.7],
-    "Combined Weight": [0.25, 0.25, 0.25, 0.4, 0.5, 0.15, 0.3, 0.12, 0.18, 0.18, 0.3, 0.3, 0.6, 0.3, 0.42, 0.6, 0.16, 0.24, 0.36, 0.36, 0.2, 0.2, 0.28, 0.36, 0.36, 0.48, 0.6, 0.35, 0.49, 0.63, 0.7],
-    "subset": ["1.1", "1.2", "1.3", "1.4", "1.5", "2a.1.L", "2a.2.L", "2a.1.G", "2a.2.G", "2a.3.G", "2a.4.G", "2b.1.L", "2b.2.L", "2b.1.G", "2b.2.G", "2b.3.G", "3.1", "3.2", "3.3", "3.4", "4.1", "4.2", "4.3", "4.4", "6.1", "6.2", "6.3", "7.1", "7.2", "7.3", "7.4"]
+    "Weights": [0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.6, 0.6, 0.6, 0.6, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.7, 0.5, 0.9, 0.9, 0.6, 0.6],
+    "Combined Weight": [0.25, 0.25, 0.25, 0.4, 0.5, 0.15, 0.3, 0.12, 0.18, 0.18, 0.3, 0.3, 0.6, 0.3, 0.42, 0.6, 0.16, 0.16, 0.24, 0.36, 0.2, 0.2, 0.28, 0.36, 0.2, 0.2, 0.12, 0.20, 0.36, 0.48, 0.6, 0.35, 0.49, 0.63, 0.7, 0.5, 0.9, 0.9, 0.6, 0.6],
+    "subset": ["1.1", "1.2", "1.3", "1.4", "1.5", "2a.1.L", "2a.2.L", "2a.1.G", "2a.2.G", "2a.3.G", "2a.4.G", "2b.1.L", "2b.2.L", "2b.1.G", "2b.2.G", "2b.3.G", "3.1", "3.2", "3.3", "3.4", "4.1", "4.2", "4.3", "4.4", "5.1a", "5.1b", "5.1c", "5.1d", "6.1", "6.2", "6.3", "7.1", "7.2", "7.3", "7.4", "8.1", "9.1", "10.1", "11.1", "12.1"]
 }
 
 # Convert the dictionary to a pandas DataFrame
