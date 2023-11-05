@@ -182,9 +182,9 @@ def main():
 
             # Display recommendations for each split
             for first_half, second_half in halves:
-                split_key = tuple(sorted(first_half)) + tuple(sorted(second_half))
-                if split_key not in displayed_splits:
-                    displayed_splits.add(split_key)
+                sorted_split_key = tuple(sorted(first_half)) + tuple(sorted(second_half))
+                if sorted_split_key not in displayed_splits:
+                    displayed_splits.add(sorted_split_key)
                     st.subheader(f"Recommendations for Split {len(first_half)}-{len(second_half)}:")
                     recommendations_first_half = recommend_grids(df, df_2, first_half)
                     recommendations_second_half = recommend_grids(df, df_2, second_half)
@@ -193,8 +193,8 @@ def main():
                     display_recommendations(recommendations_second_half)
 
             # Final recommendations for the entire list (from Code 1)
-            user_inputs_key = tuple(sorted(user_inputs))
-            if user_inputs_key not in displayed_splits:
+            sorted_user_inputs_key = tuple(sorted(user_inputs))
+            if sorted_user_inputs_key not in displayed_splits:
                 recommendations = recommend_grids(df, df_2, user_inputs)
                 display_recommendations(recommendations)
         else:
