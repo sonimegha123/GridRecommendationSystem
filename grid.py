@@ -7,20 +7,20 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 import random
 
-'''New Combined Method:
-If the "Get Recommendations" button is pressed:
-Check if the user has entered more than 3 items.
+#New Combined Method:
+#If the "Get Recommendations" button is pressed:
+#Check if the user has entered more than 3 items.
 
-If they have:
-First Phase (from Code 2): Split the user's inputs exactly in half and display recommendations for each half. This gives a focused recommendation based on two broad groups.
+#If they have:
+#First Phase (from Code 2): Split the user's inputs exactly in half and display recommendations for each half. This gives a focused recommendation based on two broad groups.
 
-Second Phase (Custom): Choose a few (e.g., 2 or 3) random or strategically selected split points, other than the exact half. For each of these splits, get and display recommendations for both halves. This introduces an element of variety and covers more combinations of user inputs.
+#Second Phase (Custom): Choose a few (e.g., 2 or 3) random or strategically selected split points, other than the exact half. For each of these splits, get and display recommendations for both halves. This introduces an element of variety and covers more combinations of user inputs.
 
-Final Phase (from Code 1): Finally, get recommendations for the entire list of user inputs and display them. This ensures that the overall preferences are considered.
+#Final Phase (from Code 1): Finally, get recommendations for the entire list of user inputs and display them. This ensures that the overall preferences are considered.
 
-If the user has entered 3 items or less:
+#If the user has entered 3 items or less:
 
-Get recommendations for the entire list of user inputs and display them.'''
+#Get recommendations for the entire list of user inputs and display them.
 
 
 
