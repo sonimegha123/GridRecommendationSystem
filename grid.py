@@ -1,9 +1,14 @@
 import itertools
-import pandas as pd 
+import pandas as pd
 import streamlit as st
 import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
+from itertools import combinations
+import random
+
+
+
 data = {
     ('Paragraph', '1.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
     ('Paragraph', '1.2'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
@@ -39,13 +44,14 @@ data = {
     ('List', '7.1'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
     ('List', '7.2'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
     ('List', '7.3'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
-    ('List', '7.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},  
+    ('List', '7.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
     ('Cycle', '8.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
     ('Process', '9.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
     ('Timeline', '10.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
     ('Funnel', '11.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
     ('Pyramid', '12.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
 }
+
 
 # Create a MultiIndex from the tuple keys
 index = pd.MultiIndex.from_tuples(data.keys(), names=["Element", "Subset"])
@@ -79,7 +85,6 @@ def assign_weights(df_2, user_inputs, combinations):
     sorted_recommendations = sorted(combinations, key=lambda x: int(x.rstrip('% V H')), reverse=True)
     return {element[0]: recommendation for element, recommendation in zip(sorted_inputs, sorted_recommendations)}
 
-
 def recommend_grids(df, df_2, user_inputs):
     """
     Recommend grids based on user input.
@@ -100,17 +105,17 @@ def recommend_grids(df, df_2, user_inputs):
     valid_combinations = [combo for combo in all_combinations if sum(int(percent.split('%')[0]) for percent in combo) in (100, 99)]
 
     if len(user_subsets) == 1:
-        return [{'0%': '100%'}]
+        #return [{'0%': '100%'}]
+        return [{user_inputs[0][0]: '100%'}]
 
     # Filter out symmetric combinations
     def is_symmetric(combination):
-        return (combination[0], combination[1]) not in [('50% V', '50% H'), ('50% H', '50% V')]
-
+        return (combination[0], combination[1]) not in [('50% V', '50% H'), ('50% H', '50% V'), ('25% V', '25% H')]
+   
     valid_combinations = list(filter(is_symmetric, valid_combinations))
 
     if valid_combinations:
         return [assign_weights(df_2, user_inputs, combo) for combo in valid_combinations]
-
     else:
         subset_weights = df_2[df_2['subset'].isin(user_subsets)]['Combined Weight']
         highest_weight_element = subset_weights.idxmax()
@@ -119,6 +124,14 @@ def recommend_grids(df, df_2, user_inputs):
         other = [t for t in user_inputs if t[1] != top_subset]
         return recommend_grids(df, df_2, other)
 
+def split_combinations(lst):
+    if not lst:
+        return [[]]
+    combinations = []
+    for i in range(1, len(lst)):
+        for combo in split_combinations(lst[i:]):
+            combinations.append([lst[:i]] + combo)
+    return combinations
 
 # Define the Streamlit app
 def main():
@@ -153,35 +166,62 @@ def main():
         st.sidebar.write(f"Element: {user_input[0]}, Subset: {user_input[1]}")
 
     if st.sidebar.button("Get Recommendations"):
-        recommendations = recommend_grids(df, df_2, user_inputs)
+    # Check if user inputs have more than 3 elements
+        if len(user_inputs) > 3:
+            # Split in half (from Code 2)
+            split_index = len(user_inputs) // 2
+            halves = [(user_inputs[:split_index], user_inputs[split_index:])]
 
-        # Filter out duplicate recommendations
-        unique_recommendations = []
-        seen_recommendations = set()
-        for recommendation in recommendations:
-            recommendation_str = ", ".join([f"{key}: {value}" for key, value in recommendation.items()])
-            if recommendation_str not in seen_recommendations:
-                unique_recommendations.append(recommendation)
-                seen_recommendations.add(recommendation_str)
+            # Additional splits: Choose 2 random split points
+            random_splits = random.sample(range(1, len(user_inputs)), 2)
+            for split in random_splits:
+                halves.append((user_inputs[:split], user_inputs[split:]))
 
-        # Display unique recommendations as pie charts
-        st.header("Recommended Grids")
-        if len(unique_recommendations) == 0:
-            st.error("No valid recommendations found.")
+            # Use a set to keep track of displayed splits
+            displayed_splits = set()
+
+            # Display recommendations for each split
+            for first_half, second_half in halves:
+                split_key = tuple(sorted(first_half)) + tuple(sorted(second_half))
+                if split_key not in displayed_splits:
+                    displayed_splits.add(split_key)
+                    st.subheader(f"Recommendations for Split {len(first_half)}-{len(second_half)}:")
+                    recommendations_first_half = recommend_grids(df, df_2, first_half)
+                    recommendations_second_half = recommend_grids(df, df_2, second_half)
+
+                    display_recommendations(recommendations_first_half)
+                    display_recommendations(recommendations_second_half)
+
+            # Final recommendations for the entire list (from Code 1)
+            user_inputs_key = tuple(sorted(user_inputs))
+            if user_inputs_key not in displayed_splits:
+                recommendations = recommend_grids(df, df_2, user_inputs)
+                display_recommendations(recommendations)
         else:
-            st.success("Unique Recommended Grids:")
-            for i, recommendation in enumerate(unique_recommendations, start=1):
-                st.subheader(f"Recommendation {i}")
-                display_grid(recommendation)
+            recommendations = recommend_grids(df, df_2, user_inputs)
+            display_recommendations(recommendations)
+
+# Function to display the recommended grid as pie charts
+def display_recommendations(recommendations):
+    if len(recommendations) == 0:
+        st.error("No valid recommendations found.")
+    else:
+        st.success("Unique Recommended Grids:")
+        for i, recommendation in enumerate(recommendations, start=1):
+            st.subheader(f"Recommendation {i}")
+            display_grid(recommendation)
 
 # Function to display the recommended grid as a pie chart
 def display_grid(recommendation):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    percentages = [int(percent.split('%')[0]) for percent in recommendation.values()]
-    labels = recommendation.keys()
-    ax.pie(percentages, labels=labels, autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')
-    st.pyplot(fig)
+    if not recommendation:
+        st.warning("No data to display.")
+    else:
+        fig, ax = plt.subplots(figsize=(6, 4))
+        percentages = [int(percent.split('%')[0]) for percent in recommendation.values()]
+        labels = recommendation.keys()
+        ax.pie(percentages, labels=labels, autopct='%1.1f%%', startangle=90)
+        ax.axis('equal')
+        st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
