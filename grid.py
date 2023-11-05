@@ -7,6 +7,21 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 import random
 
+'''New Combined Method:
+If the "Get Recommendations" button is pressed:
+Check if the user has entered more than 3 items.
+
+If they have:
+First Phase (from Code 2): Split the user's inputs exactly in half and display recommendations for each half. This gives a focused recommendation based on two broad groups.
+
+Second Phase (Custom): Choose a few (e.g., 2 or 3) random or strategically selected split points, other than the exact half. For each of these splits, get and display recommendations for both halves. This introduces an element of variety and covers more combinations of user inputs.
+
+Final Phase (from Code 1): Finally, get recommendations for the entire list of user inputs and display them. This ensures that the overall preferences are considered.
+
+If the user has entered 3 items or less:
+
+Get recommendations for the entire list of user inputs and display them.'''
+
 
 
 data = {
@@ -160,6 +175,7 @@ def main():
         subset = st.sidebar.selectbox(f"Select Subset for {element}", available_subsets, key=element)
         user_inputs.append((element, subset))
 
+
     # Display user inputs
     st.sidebar.header("Selected Inputs")
     for user_input in user_inputs:
@@ -168,35 +184,27 @@ def main():
     if st.sidebar.button("Get Recommendations"):
     # Check if user inputs have more than 3 elements
         if len(user_inputs) > 3:
-            # Split in half (from Code 2)
+        # Split in half (from Code 2)
             split_index = len(user_inputs) // 2
             halves = [(user_inputs[:split_index], user_inputs[split_index:])]
-
-            # Additional splits: Choose 2 random split points
+        
+        # Additional splits: Choose 2 random split points
             random_splits = random.sample(range(1, len(user_inputs)), 2)
             for split in random_splits:
                 halves.append((user_inputs[:split], user_inputs[split:]))
 
-            # Use a set to keep track of displayed splits
-            displayed_splits = set()
-
-            # Display recommendations for each split
+        # Display recommendations for each split
             for first_half, second_half in halves:
-                sorted_split_key = tuple(sorted(first_half)) + tuple(sorted(second_half))
-                if sorted_split_key not in displayed_splits:
-                    displayed_splits.add(sorted_split_key)
-                    st.subheader(f"Recommendations for Split {len(first_half)}-{len(second_half)}:")
-                    recommendations_first_half = recommend_grids(df, df_2, first_half)
-                    recommendations_second_half = recommend_grids(df, df_2, second_half)
+                st.subheader(f"Recommendations for Split {len(first_half)}-{len(second_half)}:")
+                recommendations_first_half = recommend_grids(df, df_2, first_half)
+                recommendations_second_half = recommend_grids(df, df_2, second_half)
+            
+                display_recommendations(recommendations_first_half)
+                display_recommendations(recommendations_second_half)
 
-                    display_recommendations(recommendations_first_half)
-                    display_recommendations(recommendations_second_half)
-
-            # Final recommendations for the entire list (from Code 1)
-            sorted_user_inputs_key = tuple(sorted(user_inputs))
-            if sorted_user_inputs_key not in displayed_splits:
-                recommendations = recommend_grids(df, df_2, user_inputs)
-                display_recommendations(recommendations)
+        # Final recommendations for the entire list (from Code 1)
+            recommendations = recommend_grids(df, df_2, user_inputs)
+            display_recommendations(recommendations)
         else:
             recommendations = recommend_grids(df, df_2, user_inputs)
             display_recommendations(recommendations)
@@ -213,15 +221,12 @@ def display_recommendations(recommendations):
 
 # Function to display the recommended grid as a pie chart
 def display_grid(recommendation):
-    if not recommendation:
-        st.warning("No data to display.")
-    else:
-        fig, ax = plt.subplots(figsize=(6, 4))
-        percentages = [int(percent.split('%')[0]) for percent in recommendation.values()]
-        labels = recommendation.keys()
-        ax.pie(percentages, labels=labels, autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')
-        st.pyplot(fig)
+    fig, ax = plt.subplots(figsize=(6, 4))
+    percentages = [int(percent.split('%')[0]) for percent in recommendation.values()]
+    labels = recommendation.keys()
+    ax.pie(percentages, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
