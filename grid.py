@@ -183,5 +183,5 @@ def display_grid(recommendation):
     ax.axis('equal')
     st.pyplot(fig)
 
-#if __name__ == "__main__":
-#    main()
+if __name__ == "__main__":
+    main()
