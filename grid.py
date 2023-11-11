@@ -6,79 +6,122 @@ import itertools
 import matplotlib.pyplot as plt
 from itertools import combinations
 import random
+import pandas as pd 
 
-#New Combined Method:
-#If the "Get Recommendations" button is pressed:
-#Check if the user has entered more than 3 items.
-
-#If they have:
-#First Phase (from Code 2): Split the user's inputs exactly in half and display recommendations for each half. This gives a focused recommendation based on two broad groups.
-
-#Second Phase (Custom): Choose a few (e.g., 2 or 3) random or strategically selected split points, other than the exact half. For each of these splits, get and display recommendations for both halves. This introduces an element of variety and covers more combinations of user inputs.
-
-#Final Phase (from Code 1): Finally, get recommendations for the entire list of user inputs and display them. This ensures that the overall preferences are considered.
-
-#If the user has entered 3 items or less:
-
-#Get recommendations for the entire list of user inputs and display them.
-
-
-
+# Define the structure of the DataFrame as shown in the user's table
 data = {
-    ('Paragraph', '1.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Paragraph', '1.2'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Paragraph', '1.3'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Paragraph', '1.4'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
-    ('Paragraph', '1.5'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
-    ('Bullet Point (Headings Only)', '2a.1.L'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Bullet Point (Headings Only)', '2a.2.L'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
-    ('Bullet Point (Headings Only)', '2a.1.G'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Bullet Point (Headings Only)', '2a.2.G'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Bullet Point (Headings Only)', '2a.3.G'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
-    ('Bullet Point (Headings Only)', '2a.4.G'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
-    ('Bullet Point (Heading + Body)', '2b.1.L'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Bullet Point (Heading + Body)', '2b.2.L'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
-    ('Bullet Point (Heading + Body)', '2b.1.G'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Bullet Point (Heading + Body)', '2b.2.G'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Bullet Point (Heading + Body)', '2b.3.G'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': False, '100%': True},
-    ('Image', '3.1'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Image', '3.2'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('Image', '3.3'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
-    ('Image', '3.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
-    ('Table', '4.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Table', '4.2'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Table', '4.3'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Table', '4.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': True},
-    ('Graph', '5.1a'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
-    ('Graph', '5.1b'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
-    ('Graph', '5.1c'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Graph', '5.1d'): {'25%': False, '33%': False, '50% V': True, '50% H': False, '67%': True, '100%': True},
-    ('Quote', '6.1'): {'25%': True, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': True},
-    ('Quote', '6.2'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
-    ('Quote', '6.3'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': False},
-    ('List', '7.1'): {'25%': False, '33%': True, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('List', '7.2'): {'25%': False, '33%': False, '50% V': True, '50% H': True, '67%': True, '100%': False},
-    ('List', '7.3'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': False},
-    ('List', '7.4'): {'25%': False, '33%': False, '50% V': False, '50% H': False, '67%': True, '100%': False},
-    ('Cycle', '8.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
-    ('Process', '9.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
-    ('Timeline', '10.1'): {'25%': False, '33%': False, '50% V': False, '50% H': True, '67%': True, '100%': True},
-    ('Funnel', '11.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
-    ('Pyramid', '12.1'): {'25%': False, '33%': True, '50% V': True, '50% H': False, '67%': True, '100%': True},
+    ('Paragraph', 'paragraph_800'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Paragraph', 'paragraph_1000'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Paragraph', 'paragraph_1500'): {'25%': False, '33V%': False, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Paragraph', 'paragraph_1800'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Paragraph', 'paragraph_3000'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_8l'): {'25%': True, '33V%': True, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_16l'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': False, '67H%': True, '100%': False},
+    ('Bullet Point (Headings Only)', 'bullethead_2g'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_3g'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_4g'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_5g'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_6g'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Headings Only)', 'bullethead_7g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': False, '100%': False},
+    ('Bullet Point (Headings Only)', 'bullethead_8g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': False, '100%': False},
+    ('Bullet Point (Headings Only)', 'bullethead_9g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': False, '100%': False},
+    ('Bullet Point (Headings Only)', 'bullethead_10g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': False, '100%': False},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_2l'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_6l'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_10l'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_2g'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_3g'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_4g'): {'25%': True, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_5g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_6g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_7g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_8g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_9g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    ('Bullet Point (Heading + Body)', 'bulletheadbody_10g'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    ('Image', 'image_1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Image', 'image_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Image', 'image_3'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_4'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_5'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_6'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_7'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_8'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_9'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Image', 'image_10'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+
+    ('Table', '4.1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Table', '4.2'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Table', '4.3'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Table', '4.4'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': True},
+    
+    
+   # ('Table', 'table'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Quote', 'quote_1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('Quote', 'quote_2'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Quote', 'quote_3'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Quote', 'quote_4'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_4'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_5'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_6'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_7'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_8'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_9'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_10'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': True},
+    ('List', 'list_11'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_12'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_15'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_16'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_20'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('List', 'list_25'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': False, '67H%': False, '100%': True},
+    ('Cycle', 'cycle_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Cycle', 'cycle_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Cycle', 'cycle_4'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Cycle', 'cycle_5'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Cycle', 'cycle_6'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Process', 'process_1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Process', 'process_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Process', 'process_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Process', 'process_4'): {'25%': False, '33V%': False, '33H%': False, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Process', 'process_5'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_4'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_5'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_6'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_7'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Timeline', 'timeline_8'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Funnel', 'funnel_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Funnel', 'funnel_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Funnel', 'funnel_4'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Funnel', 'funnel_5'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Funnel', 'funnel_6'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_1'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_2'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_3'): {'25%': True, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_4'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_5'): {'25%': False, '33V%': True, '33H%': True, '50% V': True, '50% H': True, '67V%': True, '67H%': True, '100%': False},
+    ('Pyramid', 'pyramid_6'): {'25%': False, '33V%': False, '33H%': False, '50% V': False, '50% H': False, '67V%': True, '67H%': True, '100%': False},
 }
-
-
 # Create a MultiIndex from the tuple keys
 index = pd.MultiIndex.from_tuples(data.keys(), names=["Element", "Subset"])
 
 # Create the DataFrame
 df = pd.DataFrame(data.values(), index=index)
 
-data = {
-    "Weights": [0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.6, 0.6, 0.6, 0.6, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.7, 0.5, 0.9, 0.9, 0.6, 0.6],
-    "Combined Weight": [0.25, 0.25, 0.25, 0.4, 0.5, 0.15, 0.3, 0.12, 0.18, 0.18, 0.3, 0.3, 0.6, 0.3, 0.42, 0.6, 0.16, 0.16, 0.24, 0.36, 0.2, 0.2, 0.28, 0.36, 0.2, 0.2, 0.12, 0.20, 0.36, 0.48, 0.6, 0.35, 0.49, 0.63, 0.7, 0.5, 0.9, 0.9, 0.6, 0.6],
-    "subset": ["1.1", "1.2", "1.3", "1.4", "1.5", "2a.1.L", "2a.2.L", "2a.1.G", "2a.2.G", "2a.3.G", "2a.4.G", "2b.1.L", "2b.2.L", "2b.1.G", "2b.2.G", "2b.3.G", "3.1", "3.2", "3.3", "3.4", "4.1", "4.2", "4.3", "4.4", "5.1a", "5.1b", "5.1c", "5.1d", "6.1", "6.2", "6.3", "7.1", "7.2", "7.3", "7.4", "8.1", "9.1", "10.1", "11.1", "12.1"]
-}
+df.rename(columns = {'33V%':'33% V'}, inplace = True)
+df.rename(columns = {'33H%':'33% H'}, inplace = True)
+df.rename(columns = {'67V%':'67% V'}, inplace = True)
+df.rename(columns = {'67H%':'67% H'}, inplace = True)
+
+
+
+data = {"subset":['paragraph_800', 'paragraph_1000', 'paragraph_1500', 'paragraph_1800', 'paragraph_3000', 'bullethead_8l', 'bullethead_16l', 'bullethead_2g', 'bullethead_3g', 'bullethead_4g', 'bullethead_5g', 'bullethead_6g', 'bullethead_7g', 'bullethead_8g', 'bullethead_9g', 'bullethead_10g', 'bulletheadbody_2l', 'bulletheadbody_6l', 'bulletheadbody_10l', 'bulletheadbody_2g', 'bulletheadbody_3g', 'bulletheadbody_4g', 'bulletheadbody_5g', 'bulletheadbody_6g', 'bulletheadbody_7g', 'bulletheadbody_8g', 'bulletheadbody_9g', 'bulletheadbody_10g', 'image_1', 'image_2', 'image_3', 'image_4', 'image_5', 'image_6', 'image_7', 'image_8', 'image_9', 'image_10', '4.1', '4.2', '4.3', '4.4', 'quote_1', 'quote_2', 'quote_3', 'quote_4', 'list_1', 'list_2', 'list_3', 'list_4', 'list_5', 'list_6', 'list_7', 'list_8', 'list_9', 'list_10', 'list_11', 'list_12', 'list_15', 'list_16', 'list_20', 'list_25', 'cycle_2', 'cycle_3', 'cycle_4', 'cycle_5', 'cycle_6', 'process_1', 'process_2', 'process_3', 'process_4', 'process_5', 'timeline_2', 'timeline_3', 'timeline_4', 'timeline_5', 'timeline_6', 'timeline_7', 'timeline_8', 'funnel_2', 'funnel_3', 'funnel_4', 'funnel_5', 'funnel_6', 'pyramid_1', 'pyramid_2', 'pyramid_3', 'pyramid_4', 'pyramid_5', 'pyramid_6'],
+     "Weights" : [0.5, 0.5, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.6, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.5, 0.5, 0.5, 0.5, 0.5, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+    "Size weights" :[0.5, 0.5, 0.5, 0.8, 1.0, 0.5, 1.0, 0.4, 0.5, 0.6, 0.6, 0.6, 0.6, 0.7, 0.8, 1.0, 0.5, 0.8, 1.0, 0.5, 0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1.0, 1.0, 0.4, 0.4, 0.5, 0.6, 0.7, 0.7, 0.9, 0.9, 0.9, 1.0, 0.5, 0.5, 0.7, 0.9, 0.6, 0.8, 1.0, 1.0, 0.5, 0.6, 0.6, 0.7, 0.8, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.6, 0.7, 0.8, 0.9, 1.0, 0.6, 0.7, 0.8, 0.9, 1.0, 0.5, 0.6, 0.6, 0.7, 0.8, 0.9, 1.0, 0.6, 0.7, 0.8, 0.9, 1.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+    "Combined Weight" : [0.25, 0.25, 0.25, 0.4, 0.5, 0.15, 0.3, 0.12, 0.15, 0.18, 0.18, 0.18, 0.18, 0.21, 0.24, 0.3, 0.3, 0.48, 0.6, 0.3, 0.3, 0.36, 0.42, 0.45, 0.48, 0.54, 0.6, 0.6, 0.16, 0.16, 0.2, 0.24, 0.28, 0.28, 0.36, 0.36, 0.36, 0.4, 0.2, 0.2, 0.28, 0.36, 0.36, 0.48, 0.6, 0.6, 0.35, 0.42, 0.42, 0.49, 0.56, 0.56, 0.63, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.3, 0.35, 0.4, 0.45, 0.5, 0.54, 0.63, 0.72, 0.81, 0.9, 0.45, 0.54, 0.54, 0.63, 0.72, 0.81, 0.9, 0.36, 0.42, 0.48, 0.54, 0.6, 0.3, 0.36, 0.42, 0.48, 0.54, 0.6]}
 
 # Convert the dictionary to a pandas DataFrame
 df_2 = pd.DataFrame(data)
